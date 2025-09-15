@@ -1,0 +1,7 @@
+(rest     [coll])
+(next     [coll])
+(butlast  [coll])
+(nnext    [coll])
+(nfirst   [coll])
+(fnext    [coll])
+(ffirst   [coll])
