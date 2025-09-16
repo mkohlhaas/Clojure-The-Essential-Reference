@@ -5,6 +5,6 @@
   (.doFinal mac (get-bytes canonical)))
 
 (time (dotimes [i 100000]
-  (sign-request (str "http://example.com/tx/" i))))
+        (sign-request (str "http://example.com/tx/" i))))
 
 ;; "Elapsed time: 449.417098 msecs"           ; <3>
