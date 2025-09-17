@@ -1,7 +1,7 @@
 ## Clojure: The Essential Reference
 
-This repository contains the examples you can find in the book "Clojure: The Essential Reference" by Manning.
+![Clojure, The Essential Reference](https://images.manning.com/360/480/resize/book/d/68d30a9-7796-42f6-be7c-6d4a513b6c66/Borgatti-HI.png)
 
-The book website is https://www.manning.com/books/clojure-the-essential-reference
+This repository contains the examples you can find in the book `Clojure: The Essential Reference` by Renzo Borgatti, Manning Books.
 
-The examples are organized by chapters and then by functions or group of functions. They are then ordered numerically. They are automatically extracted, so labels of files and folders are a bit funky.
+The book website is [Clojure: The Essential Reference](https://www.manning.com/books/clojure-the-essential-reference).
