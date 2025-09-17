@@ -1,4 +1,5 @@
-(require '[clojure.repl])
+(ns f.doc
+  (:require [clojure.repl]))
 
 (defn hello
   "A function to say hello"
@@ -10,6 +11,5 @@
 ; (out) profilable/hello
 ; (out) ([person])
 ; (out)   A function to say hello
-;; -------------------------
 
 (:doc (meta #'hello)) ; "A function to say hello"
