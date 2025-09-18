@@ -1,2 +1,3 @@
-(defmacro future [& body] ; <1>
-  `(future-call (^{:once true} fn* [] ~@body))) ; <2>
+#_{:clj-kondo/ignore [:redefined-var]}
+(defmacro future [& body]
+  `(future-call (^{:once true} fn* [] ~@body)))
