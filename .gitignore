@@ -1,6 +1,6 @@
 ### Clojure ###
 profiles.clj
-/.lein-*
+.lein-*
 pom.xml
 pom.xml.asc
 *.jar
