@@ -1,1 +1,0 @@
-(memfn [name & args])
