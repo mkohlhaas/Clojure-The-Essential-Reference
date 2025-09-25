@@ -1,3 +1,0 @@
-(trampoline
-  ([f])
-  ([f & args]))
