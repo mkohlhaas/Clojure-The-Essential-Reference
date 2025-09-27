@@ -1,1 +1,0 @@
-(condp [pred expr & clauses])
