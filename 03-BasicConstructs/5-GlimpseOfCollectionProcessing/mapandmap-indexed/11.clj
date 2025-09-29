@@ -1,1 +1,0 @@
-maplist[x; f] = [null[x] -> NIL; T -> cons[f[x]; maplist[cdr[x]; f]]]

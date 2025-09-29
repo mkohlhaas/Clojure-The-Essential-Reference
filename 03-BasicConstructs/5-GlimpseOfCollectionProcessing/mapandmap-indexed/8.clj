@@ -1,1 +1,0 @@
-maplist(cdr(J), K, diff(K))
