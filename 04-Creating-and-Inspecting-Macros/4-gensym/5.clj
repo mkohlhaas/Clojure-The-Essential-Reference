@@ -1,1 +1,0 @@
-(OR (EXIST x (Q x)) (P x)) <!=> (EXIST x (OR (P x) (Q x))) ; <1>
