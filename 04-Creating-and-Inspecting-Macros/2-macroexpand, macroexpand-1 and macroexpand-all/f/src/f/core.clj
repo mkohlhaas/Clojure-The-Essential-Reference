@@ -11,6 +11,7 @@
 ;   [a (clojure.core/first xs__3323__auto__)]
 ;   (println a)))
 
+;; `macroexpand` loops `macroexpand-1` on the form until the first element doesn’t resolve to a macro anymore.
 (macroexpand '(when-first [a [1 2 3]] (println a)))
 ; (let*
 ;  [temp250 (clojure.core/seq [1 2 3])]
