@@ -1,4 +1,0 @@
-(+)bigdec
-(-)bigdec
-(*)bigdec
-(/)bigdec
