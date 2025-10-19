@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [bench]]))
+  (:require
+   [criterium.core :refer [bench]]))
 
 ;; The unchecked-*-int family is especially useful to implement hashing algorithms and integer math in general.
 

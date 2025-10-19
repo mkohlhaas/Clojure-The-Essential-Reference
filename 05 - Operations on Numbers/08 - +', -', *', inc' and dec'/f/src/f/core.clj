@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [quick-bench]]))
+  (:require
+   [criterium.core :refer [quick-bench]]))
 
 (+' Double/MAX_VALUE Double/MAX_VALUE)                   ; ##Inf
 (+' (bigdec Double/MAX_VALUE) (bigdec Double/MAX_VALUE)) ; 3.5953862697246314E+308M

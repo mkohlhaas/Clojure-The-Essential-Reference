@@ -1,7 +1,8 @@
 (ns f.core
-  (:require [clojure.string :refer [split]]
-            [criterium.core :refer [bench]]
-            [no.disassemble :refer [disassemble]]))
+  (:require
+   [clojure.string :refer [split]]
+   [criterium.core :refer [bench]]
+   [no.disassemble :refer [disassemble]]))
 
 ;; You should take particular care using case with test expressions other than numbers, strings and keywords.
 

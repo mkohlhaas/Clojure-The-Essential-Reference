@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.walk]))
+  (:require
+   [clojure.walk]))
 
 (comment
   ;; does not work

@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string]))
+  (:require
+   [clojure.string]))
 
 ;; ;;;;;
 ;; Lists

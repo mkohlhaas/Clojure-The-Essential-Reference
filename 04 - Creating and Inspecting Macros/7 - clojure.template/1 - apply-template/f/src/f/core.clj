@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.template :refer [apply-template]]))
+  (:require
+   [clojure.template :refer [apply-template]]))
 
 ;; The original author of `apply-template` has stated that its inclusion in the Clojure standard library might have been a bad idea.
 

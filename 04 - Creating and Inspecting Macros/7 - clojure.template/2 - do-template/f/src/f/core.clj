@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.template :refer [do-template]]))
+  (:require
+   [clojure.template :refer [do-template]]))
 
 ;; Same shortcomings as `apply-template`.
 ;; Better alternative might be [core.unify](https://github.com/clojure/core.unify).

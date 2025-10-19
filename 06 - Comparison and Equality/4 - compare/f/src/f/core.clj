@@ -1,5 +1,6 @@
 (ns f.core
-  (:import java.util.GregorianCalendar))
+  (:import
+   java.util.GregorianCalendar))
 
 (let [c (compare 1 2)]
   (cond

@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :refer [join]]))
+  (:require
+   [clojure.string :refer [join]]))
 
 ;; function multiplexer
 ((juxt first second last) (range 10))

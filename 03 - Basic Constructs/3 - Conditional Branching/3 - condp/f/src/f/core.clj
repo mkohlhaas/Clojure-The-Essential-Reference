@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :refer [split]]))
+  (:require
+   [clojure.string :refer [split]]))
 
 ;; `condp` throws IllegalArgumentException when a matching clause cannot 
 ;; be found and no default is provided - does't return nil!!!

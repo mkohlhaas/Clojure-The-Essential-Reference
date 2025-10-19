@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [quick-bench]]))
+  (:require
+   [criterium.core :refer [quick-bench]]))
 
 ;; ;;;;;;;;;
 ;; Example 1

@@ -1,9 +1,10 @@
 (ns g.core
-  (:require [clojure.xml          :as xml]
-            [clojure.java.javadoc :refer [javadoc]]
-            [clojure.java.io      :as io]
-            [clojure.string       :refer [split capitalize join]]
-            [clojure.pprint       :refer [cl-format]]))
+  (:require
+   [clojure.java.io      :as io]
+   [clojure.java.javadoc :refer [javadoc]]
+   [clojure.pprint       :refer [cl-format]]
+   [clojure.string       :refer [capitalize join split]]
+   [clojure.xml          :as xml]))
 
 (def balance
   "<balance>

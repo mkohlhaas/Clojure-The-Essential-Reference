@@ -1,7 +1,8 @@
 (ns f.core
-  (:import java.util.ArrayList
-           java.util.HashSet
-           java.util.HashMap))
+  (:import
+   java.util.ArrayList
+   java.util.HashMap
+   java.util.HashSet))
 
 (hash "hello")         ; 1715862179
 (hash nil)             ; 0

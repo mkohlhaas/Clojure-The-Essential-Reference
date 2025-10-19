@@ -1,6 +1,8 @@
 (ns f.core
-  (:require [clojure.java.javadoc :refer [javadoc]])
-  (:import java.util.concurrent.LinkedBlockingQueue))
+  (:require
+   [clojure.java.javadoc :refer [javadoc]])
+  (:import
+   java.util.concurrent.LinkedBlockingQueue))
 
 ;; To verify if the arguments are stored at the same memory location.
 

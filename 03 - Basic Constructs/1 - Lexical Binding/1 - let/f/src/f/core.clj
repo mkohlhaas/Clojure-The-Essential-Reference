@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [no.disassemble :refer [disassemble]]))
+  (:require
+   [no.disassemble :refer [disassemble]]))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; `let` as Syntactic Sugar for Lambda Function Invokation

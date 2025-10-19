@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [quick-bench]]))
+  (:require
+   [criterium.core :refer [quick-bench]]))
 
 ;; `==` is best for numbers because it respects the general notion that number equivalence 
 ;; is independent from types or binary representation.

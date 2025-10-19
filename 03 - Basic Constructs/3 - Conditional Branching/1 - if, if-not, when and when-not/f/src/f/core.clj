@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.java.javadoc :as browse]))
+  (:require
+   [clojure.java.javadoc :as browse]))
 
 ;; conditional forms always return a value
 

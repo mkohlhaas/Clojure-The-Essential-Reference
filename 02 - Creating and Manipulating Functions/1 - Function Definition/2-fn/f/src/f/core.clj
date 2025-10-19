@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.java.javadoc :refer  [javadoc]]))
+  (:require
+   [clojure.java.javadoc :refer  [javadoc]]))
 
 ((fn [x] (* (Math/random) x))
  (System/currentTimeMillis))

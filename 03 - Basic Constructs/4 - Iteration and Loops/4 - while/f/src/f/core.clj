@@ -1,9 +1,11 @@
 (ns f.core
-  (:require [clojure.java.io :as io])
-  (:import  [java.io File]
-            [javax.xml.bind DatatypeConverter]
-            [java.security  MessageDigest]
-            [java.security  DigestInputStream]))
+  (:require
+   [clojure.java.io :as io])
+  (:import
+   [java.io File]
+   [java.security  MessageDigest]
+   [java.security  DigestInputStream]
+   [javax.xml.bind DatatypeConverter]))
 
 ;; Usage of `while` should be restricted to a few special cases such as
 ;; Java interoperability, since more idiomatic iteration forms exist

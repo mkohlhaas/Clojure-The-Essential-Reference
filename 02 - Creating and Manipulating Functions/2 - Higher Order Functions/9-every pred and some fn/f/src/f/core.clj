@@ -1,6 +1,7 @@
 (ns f.core
-  (:require [clojure.string :refer [split]]
-            [criterium.core :refer [quick-bench]]))
+  (:require
+   [clojure.string :refer [split]]
+   [criterium.core :refer [quick-bench]]))
 
 ;; a tricky expression that seems to work correctly when it’s not:
 (remove (and number? pos? odd?) (range 10))              ; (0 2 4 6 8)

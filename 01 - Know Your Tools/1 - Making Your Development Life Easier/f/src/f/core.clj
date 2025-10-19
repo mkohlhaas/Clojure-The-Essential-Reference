@@ -1,6 +1,7 @@
 (ns f.core
-  (:require [clojure.xml          :as xml]
-            [clojure.java.javadoc :refer [javadoc]]))
+  (:require
+   [clojure.java.javadoc :refer [javadoc]]
+   [clojure.xml          :as xml]))
 
 (def balance
   "<balance>

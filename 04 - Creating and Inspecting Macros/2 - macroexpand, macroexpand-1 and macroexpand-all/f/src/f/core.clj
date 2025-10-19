@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.walk :as w]))
+  (:require
+   [clojure.walk :as w]))
 
 (macroexpand-1 '(when false (println "this will never be printed!")))
 ; (if false (do (println "this will never be printed!")))

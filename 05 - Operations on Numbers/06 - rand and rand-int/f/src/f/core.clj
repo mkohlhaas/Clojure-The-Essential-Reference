@@ -1,8 +1,9 @@
 (ns f.core
-  (:import java.awt.image.BufferedImage
-           java.util.Random
-           javax.imageio.ImageIO
-           java.io.File))
+  (:import
+   java.awt.image.BufferedImage
+   java.io.File
+   java.util.Random
+   javax.imageio.ImageIO))
 
 (rand)         ; 0.2575534079749804
 (rand-int -10) ; -6

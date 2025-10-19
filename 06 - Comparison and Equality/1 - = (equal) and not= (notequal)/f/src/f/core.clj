@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [bench]]))
+  (:require
+   [criterium.core :refer [bench]]))
 
 (= "a" "a" "a") ; true
 (not= 1 2)      ; true

@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [quick-bench]]))
+  (:require
+   [criterium.core :refer [quick-bench]]))
 
 (quot 38 4) ; 9
 (rem  38 4) ; 2

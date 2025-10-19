@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :as s :refer [lower-case]]))
+  (:require
+   [clojure.string :as s :refer [lower-case]]))
 
 ;; Defining a macro is as simple as defining functions and manipulating data:
 ;; macros are indeed just regular functions that the compiler invokes at compile

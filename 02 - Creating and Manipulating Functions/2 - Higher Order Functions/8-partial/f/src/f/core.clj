@@ -1,6 +1,7 @@
 (ns f.core
-  (:require [clojure.string :refer [index-of]]
-            [criterium.core :refer [bench]]))
+  (:require
+   [clojure.string :refer [index-of]]
+   [criterium.core :refer [bench]]))
 
 ;; ;;;;;;;;;;;
 ;; Incrementer

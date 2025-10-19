@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [quick-bench]]))
+  (:require
+   [criterium.core :refer [quick-bench]]))
 
 (dotimes [i 3] ; NOTE: bindings must be a vector of two elements only
   (println i))

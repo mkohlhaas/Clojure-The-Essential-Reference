@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.data :refer [diff]]))
+  (:require
+   [clojure.data :refer [diff]]))
 
 (diff {:a "1" :b "2"} {:b "2" :c "4"})
 ; ({:a "1"}  ; things only in first  arg

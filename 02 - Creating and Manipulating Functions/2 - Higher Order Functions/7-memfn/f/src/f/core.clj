@@ -1,5 +1,6 @@
 (ns f.core
-  (:import [java.time Instant Duration]))
+  (:import
+   [java.time Duration Instant]))
 
 ;; `memfn` allows Java instance methods to be passed as arguments to Clojure functions.
 ;; A static method does not require the use of `memfn`.

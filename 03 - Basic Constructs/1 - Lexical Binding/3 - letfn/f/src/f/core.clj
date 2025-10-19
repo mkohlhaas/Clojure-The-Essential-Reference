@@ -1,6 +1,7 @@
 (ns f.core
-  (:require [clojure.string :as s]
-            [clojure.repl   :refer [source-fn]]))
+  (:require
+   [clojure.repl   :refer [source-fn]]
+   [clojure.string :as s]))
 
 (letfn [(square [x] (* x x))]
   (map square (range 10)))

@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :refer [starts-with? split-lines]]))
+  (:require
+   [clojure.string :refer [split-lines starts-with?]]))
 
 ;; ;;;;;;;;;;;;;;;;;;;;;;
 ;; introduction to `comp`

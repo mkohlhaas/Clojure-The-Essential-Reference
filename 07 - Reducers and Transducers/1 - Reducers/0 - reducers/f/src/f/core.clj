@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.core.reducers :as r]))
+  (:require
+   [clojure.core.reducers :as r]))
 
 ;; To avoid confusion with the same functions in clojure.core, functions are often prefixed with `r/` (which is a conventional alias for clojure.core.reducers).
 

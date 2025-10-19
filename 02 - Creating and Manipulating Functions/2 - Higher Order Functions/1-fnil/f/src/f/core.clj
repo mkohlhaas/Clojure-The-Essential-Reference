@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :refer [replace split] :rename {replace replace-str}]))
+  (:require
+   [clojure.string :refer [replace split] :rename {replace replace-str}]))
 
 ;; ;;;;;;;;;
 ;; Example 1

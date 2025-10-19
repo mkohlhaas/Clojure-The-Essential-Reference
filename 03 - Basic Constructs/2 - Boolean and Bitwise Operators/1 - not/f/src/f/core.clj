@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string]))
+  (:require
+   [clojure.string]))
 
 ;; In Clojure, the only `false` and `nil` are falsy!
 

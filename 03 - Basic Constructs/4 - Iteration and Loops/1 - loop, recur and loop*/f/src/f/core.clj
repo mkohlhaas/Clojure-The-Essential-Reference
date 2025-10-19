@@ -1,6 +1,7 @@
 (ns f.core
-  (:require [criterium.core :refer [bench]]
-            [no.disassemble :refer [disassemble]]))
+  (:require
+   [criterium.core :refer [bench]]
+   [no.disassemble :refer [disassemble]]))
 
 ;; idiomatic functional style
 (loop [i 0

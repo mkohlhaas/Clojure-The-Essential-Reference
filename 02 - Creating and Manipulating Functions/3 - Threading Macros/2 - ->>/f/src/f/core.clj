@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.string :refer [split]]))
+  (:require
+   [clojure.string :refer [split]]))
 
 ;; Thread Last Macro
 

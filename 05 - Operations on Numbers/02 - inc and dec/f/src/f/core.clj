@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [criterium.core :refer [bench]]))
+  (:require
+   [criterium.core :refer [bench]]))
 
 (inc 1) ; 2
 (dec 1) ; 0

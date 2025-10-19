@@ -1,7 +1,8 @@
 (ns f.core
-  (:require [clojure.java.io    :as io]
-            [clojure.string     :as s]
-            [clojure.core.async :refer [go go-loop chan >! <! <!! close!]]))
+  (:require
+   [clojure.core.async :refer [<! <!! >! chan close! go go-loop]]
+   [clojure.java.io    :as io]
+   [clojure.string     :as s]))
 
 ;; -let  => nil and false are falsy
 ;; -some => only nil is falsy - false itself is truish!!!

@@ -1,5 +1,6 @@
 (ns f.core
-  (:require [clojure.test :refer [deftest testing is]]))
+  (:require
+   [clojure.test :refer [deftest is testing]]))
 
 (identity   5) ; returns the value 5
 (constantly 5) ; returns a function that takes any number of arguments and returns 5
