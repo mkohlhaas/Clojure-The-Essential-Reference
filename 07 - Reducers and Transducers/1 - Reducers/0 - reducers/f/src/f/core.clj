@@ -2,6 +2,11 @@
   (:require
    [clojure.core.reducers :as r]))
 
+;; Reducers    focus on parallism. Eagerly
+;; Transducers focos on reuse.     Lazy.
+
+;; Reducers contain a wrapper layer on top of the Java fork-join framework (a model for parallelism introduced in Java 1.7).
+
 ;; To avoid confusion with the same functions in clojure.core, functions are often prefixed with `r/` (which is a conventional alias for clojure.core.reducers).
 
 (def map-inc        (r/map inc))
