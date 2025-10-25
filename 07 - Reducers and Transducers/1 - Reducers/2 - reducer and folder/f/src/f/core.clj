@@ -1,6 +1,7 @@
 (ns f.core
   (:require [clojure.core.reducers :as r]))
 
+;; see resources directory
 ;; https://www.infoq.com/presentations/clojure-reducers/
 
 ;; reducer and folder
