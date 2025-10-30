@@ -1,3 +1,0 @@
-(completing
-  ([f])
-  ([f cf]))
