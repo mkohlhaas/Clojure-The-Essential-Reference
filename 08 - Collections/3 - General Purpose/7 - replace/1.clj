@@ -1,3 +1,0 @@
-(replace
-  ([smap])
-  ([smap coll]))
