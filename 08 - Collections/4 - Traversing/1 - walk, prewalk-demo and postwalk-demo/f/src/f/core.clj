@@ -2,6 +2,9 @@
   (:require
    [clojure.walk :refer [postwalk-demo prewalk-demo walk]]))
 
+;; traversal is pre-order  if the function executes on the parent   before the children
+;; traversal is post-order if the function executes on the children before the parent 
+
 (defn inner [x] (println "inner on" x) x)
 (defn outer [x] (println "outer on" x) x)
 
@@ -13,6 +16,7 @@
 ; (out) outer on [1 [2] #{1 :a} 4]
 ; [1 [2] #{1 :a} 4]
 
+;; depth-first, pre-order
 (prewalk-demo [1 [2 [3]] 4])
 ; (out) Walked: [1 [2 [3]] 4]
 ; (out) Walked: 1
@@ -23,6 +27,7 @@
 ; (out) Walked: 4
 ; [1 [2 [3]] 4]
 
+;; depth-first, post-order
 (postwalk-demo [1 [2 [3]] 4])
 ; (out) Walked: 1
 ; (out) Walked: 2
