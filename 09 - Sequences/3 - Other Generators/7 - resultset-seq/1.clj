@@ -1,1 +1,0 @@
-(defn resultset-seq [rs])
