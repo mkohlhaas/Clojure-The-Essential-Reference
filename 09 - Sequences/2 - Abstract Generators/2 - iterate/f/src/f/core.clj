@@ -3,12 +3,22 @@
 
 (take 10 (iterate inc 0))   ; (0 1 2 3 4 5 6 7 8 9)
 
-(def fibo
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
+
+;; Fibonacci
+
+(def fibonacci
   (iterate
    (fn [[x y]] [y (+' x y)])
    [0 1]))
 
-(take 10 (map first fibo))  ; (0 1 1 2 3 5 8 13 21 34)
+(take 10 fibonacci)              ; ([0 1] [1 1] [1 2] [2 3] [3 5] [5 8] [8 13] [13 21] [21 34] [34 55])
+(take 10 (map first fibonacci))  ; (0 1 1 2 3 5 8 13 21 34)
+
+;; PI: inverse tangent series at the basis of the Leibniz approximation of Pi 
+;; see also `filterv`
 
 (defn calculate-pi [precision]
   (transduce
@@ -19,7 +29,10 @@
    (iterate #(* ((if (pos? %) + -) % 2) -1) 1.0)))
 
 (comment
-  (calculate-pi 1e-6)) ; 3.141592153589724
+  (calculate-pi 1e-6)         ; 3.141592153589724
+  (time (calculate-pi 1e-6))) ; (out) "Elapsed time: 26010.49295 msecs"
+
+;; Game of Life
 
 (defn grid [h w cells]
   (letfn [(concats [& strs]
@@ -41,10 +54,47 @@
        (row y x cells))
      (edge w))))
 
-;; please see "next-gen" from the "for" chapter.
+;; START
+;; from the "for" chapter in "03 - Basic Constructs/4 - Iteration and Loops/3 - for/"
+(defn under-populated? [n alive?] (and (< n 2) alive?))
+(defn over-populated?  [n alive?] (and (> n 3) alive?))
+(defn healthy?         [n alive?] (or (and alive? (= n 2)) (= n 3)))
+(defn reproduce?       [n alive?] (and (= n 3) (not alive?)))
+
+(defn count-neighbors [h w x y cells]
+  (->> (for [dx [-1 0 1]
+             dy [-1 0 1]
+             :let [x' (+ x dx)
+                   y' (+ y dy)]
+             :when (and (not (= dx dy 0))
+                        (<= 0 x' (dec w))
+                        (<= 0 y' (dec h)))]
+         [x' y'])
+       (filter cells)
+       count))
+
+(defn apply-rules [h w x y cells]
+  (let [n            (count-neighbors h w x y cells)
+        alive?       (contains? cells [x y])
+        should-live  (or (healthy? n alive?) (reproduce? n alive?))
+        should-die   (or (under-populated? n alive?) (over-populated? n alive?))]
+    (and should-live (not should-die))))
+
+(defn next-gen [h w cells]
+  (into #{}
+        (for [x (range 0 w)
+              y (range 0 h)
+              :when (apply-rules h w x y cells)]
+          [x y])))
+
+;; using `iterate`
 (defn life [height width init]
   (iterate (partial next-gen height width) init))
 
+;; from the "for" chapter in "03 - Basic Constructs/4 - Iteration and Loops/3 - for/"
+;; END
+
+;; period 3 oscillator
 (def pulsar-init
   #{[2 4] [2 5] [2 6] [2 10] [2 11] [2 12]
     [4 2] [4 7] [4 9] [4 14]
@@ -62,89 +112,101 @@
     (doseq [state (take 3 (life height width init))]
       (println (grid height width state)))))
 
-(pulsar)
-;; ----------------------------------
-;; |                                  |
-;; |        <><><>      <><><>        |
-;; |                                  |
-;; |    <>        <>  <>        <>    |
-;; |    <>        <>  <>        <>    |
-;; |    <>        <>  <>        <>    |
-;; |        <><><>      <><><>        |
-;; |                                  |
-;; |        <><><>      <><><>        |
-;; |    <>        <>  <>        <>    |
-;; |    <>        <>  <>        <>    |
-;; |    <>        <>  <>        <>    |
-;; |                                  |
-;; |        <><><>      <><><>        |
-;; |                                  |
-;; ----------------------------------
-;;
-;; ----------------------------------
-;; |                                  |
-;; |          <>          <>          |
-;; |          <>          <>          |
-;; |          <><>      <><>          |
-;; |                                  |
-;; |  <><><>    <><>  <><>    <><><>  |
-;; |      <>  <>  <>  <>  <>  <>      |
-;; |          <><>      <><>          |
-;; |                                  |
-;; |          <><>      <><>          |
-;; |      <>  <>  <>  <>  <>  <>      |
-;; |  <><><>    <><>  <><>    <><><>  |
-;; |                                  |
-;; |          <><>      <><>          |
-;; |          <>          <>          |
-;; |          <>          <>          |
-;; |                                  |
-;; ----------------------------------
-;;
-;; ----------------------------------
-;; |                                  |
-;; |        <><>          <><>        |
-;; |          <><>      <><>          |
-;; |    <>    <>  <>  <>  <>    <>    |
-;; |    <><><>  <><>  <><>  <><><>    |
-;; |      <>  <>  <>  <>  <>  <>      |
-;; |        <><><>      <><><>        |
-;; |                                  |
-;; |        <><><>      <><><>        |
-;; |      <>  <>  <>  <>  <>  <>      |
-;; |    <><><>  <><>  <><>  <><><>    |
-;; |    <>    <>  <>  <>  <>    <>    |
-;; |          <><>      <><>          |
-;; |        <><>          <><>        |
-;; |                                  |
-;; ----------------------------------
+(comment
+  (pulsar))
+  ; (out)  ---------------------------------- 
+  ; (out) |                                  |
+  ; (out) |                                  |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |                                  |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |                                  |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |    <>        <>  <>        <>    |
+  ; (out) |                                  |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |                                  |
+  ; (out) |                                  |
+  ; (out)  ---------------------------------- 
+  ; (out) 
+  ; (out)  ---------------------------------- 
+  ; (out) |                                  |
+  ; (out) |          <>          <>          |
+  ; (out) |          <>          <>          |
+  ; (out) |          <><>      <><>          |
+  ; (out) |                                  |
+  ; (out) |  <><><>    <><>  <><>    <><><>  |
+  ; (out) |      <>  <>  <>  <>  <>  <>      |
+  ; (out) |          <><>      <><>          |
+  ; (out) |                                  |
+  ; (out) |          <><>      <><>          |
+  ; (out) |      <>  <>  <>  <>  <>  <>      |
+  ; (out) |  <><><>    <><>  <><>    <><><>  |
+  ; (out) |                                  |
+  ; (out) |          <><>      <><>          |
+  ; (out) |          <>          <>          |
+  ; (out) |          <>          <>          |
+  ; (out) |                                  |
+  ; (out)  ---------------------------------- 
+  ; (out) 
+  ; (out)  ---------------------------------- 
+  ; (out) |                                  |
+  ; (out) |                                  |
+  ; (out) |        <><>          <><>        |
+  ; (out) |          <><>      <><>          |
+  ; (out) |    <>    <>  <>  <>  <>    <>    |
+  ; (out) |    <><><>  <><>  <><>  <><><>    |
+  ; (out) |      <>  <>  <>  <>  <>  <>      |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |                                  |
+  ; (out) |        <><><>      <><><>        |
+  ; (out) |      <>  <>  <>  <>  <>  <>      |
+  ; (out) |    <><><>  <><>  <><>  <><><>    |
+  ; (out) |    <>    <>  <>  <>  <>    <>    |
+  ; (out) |          <><>      <><>          |
+  ; (out) |        <><>          <><>        |
+  ; (out) |                                  |
+  ; (out) |                                  |
+  ; (out)  ---------------------------------- 
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Performance Considerations
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (comment
   (defn iterate* [f x]
     (lazy-seq (cons x (iterate* f (f x)))))
 
   (quick-bench (into [] (take 1000000) (iterate* inc 0)))
-;; Execution time mean : 97.414648 ms
+  ; (out) Execution time mean : 374.739980 ms
 
+  ;; `iterate` is implemented in Java
   (quick-bench (into [] (take 1000000) (iterate inc 0)))
-;; Execution time mean : 44.920465 ms
+  ; (out) Execution time mean : 187.702854 ms
 
-  (let [itr (iterate* #(do (println "eval" %) (inc %)) 0) ; <1>
-        v1 (into [] (take 2) itr)
-        v2 (into [] (comp (drop 2) (take 2)) itr)]
+  ;; caching with `iterate*`
+  (let [itr (iterate* #(do (println "eval" %) (inc %)) 0)
+        v1  (into [] (take 2) itr)
+        v2  (into [] (comp (drop 2) (take 2)) itr)]
     (into v1 v2))
-;; eval 0
-;; eval 1
-;; eval 2
-;; eval 3
-;; [0 1 2 3]
+  ; (out) eval 0
+  ; (out) eval 1
+  ; (out) eval 2
+  ; (out) eval 3
+  ; [0 1 2 3]
 
-  (let [itr (iterate #(do (println "eval" %) (inc %)) 0) ; <2>
+  ;; no caching with `iterate`
+  (let [itr (iterate #(do (println "eval" %) (inc %)) 0)
         v1 (into [] (take 2) itr)
         v2 (into [] (comp (drop 2) (take 2)) itr)]
     (into v1 v2)))
-;; eval 0
-;; eval 0
-;; eval 1
-;; eval 2
-;; [0 1 2 3]
+  ; (out) eval 0
+  ; (out) eval 0
+  ; (out) eval 1
+  ; (out) eval 2
+  ; [0 1 2 3]
