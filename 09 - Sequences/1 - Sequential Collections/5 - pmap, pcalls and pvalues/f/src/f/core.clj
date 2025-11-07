@@ -2,50 +2,62 @@
   (:require
    [criterium.core :refer [quick-bench]]))
 
-(pmap + (range 10) (range 10))
-; (0 2 4 6 8 10 12 14 16 18)
+(map  + (range 10) (range 10)) ; (0 2 4 6 8 10 12 14 16 18)
+(pmap + (range 10) (range 10)) ; (0 2 4 6 8 10 12 14 16 18)
 
+;; `pcalls` and `pvalues` build on top of `pmap`
+
+;; `pcalls` for side effecting parallel functions with no arguments
 (pcalls
  (constantly "Function")
  #(System/currentTimeMillis)
  #(println "side-effect"))
-; (side-effect"
-; Function" 1762386488463 nil)
+; (side-effect"Function" 1762524570741 nil)
 
+;; expressions that are evaluated in parallel
 (pvalues
  (+ 1 1)
  (Math/sqrt 2)
  (str "last" " " "item"))
 ; (2 1.4142135623730951 "last item")
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Performance Considerations
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
 
 (comment
+  ;; map
   (let [xs (range 10000)]
     (quick-bench
      (last (map eval xs))))
-;; Execution time mean : 23.182619 ms
+  ; (out) Execution time mean : 35.442128 ms
 
+  ;; pmap slower(!)
   (let [xs (range 10000)]
     (quick-bench
      (last (pmap eval xs))))
-;; Execution time mean : 19.001539 ms
+  ; (out) Execution time mean : 70.068959 ms
 
+  ;; pmap with partitioning much faster
   (let [xs (range 10000)]
     (quick-bench
      (last (last
             (pmap
              #(map eval %)
              (partition-all 1000 xs)))))))
-;; Execution time mean : 3.208768 ms
+  ; (out) Execution time mean : 8.136368 ms
+
+;; ;;;;;;;;;;;;;;;;;;;;
+;; Understanding `pmap`
+;; ;;;;;;;;;;;;;;;;;;;;
 
 (defn dechunk [xs]
   (lazy-seq
    (when-first [x xs]
-     (cons x
-           (dechunk (rest xs))))))
+     (cons x (dechunk (rest xs))))))
+
+(comment
+  (dechunk (range 10))) ; (0 1 2 3 4 5 6 7 8 9)
 
 (defn f [x]
   (Thread/sleep (+ (* 10 x) 500))
@@ -105,6 +117,7 @@
   ; (out) done-62
   ; (out) done-63
 
+;; by changing the chunk size, we can get any grade of parallelism
   (defn re-chunk [n xs]
     (lazy-seq
      (when-let [s (seq (take n xs))]
@@ -112,6 +125,7 @@
          (doseq [x s] (chunk-append cb x))
          (chunk-cons (chunk cb) (re-chunk n (drop n xs)))))))
 
+  ;; 1000 threads
   (def s (pmap f (re-chunk 1000 (range 1000)))))
   ; (out) done-0
   ; (out) done-1
@@ -136,29 +150,36 @@
 ;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (comment
+  ;; map
   (let [xs (range 100000)] (quick-bench (last (map inc xs))))
-;; Execution time mean : 4.651943 ms
+  ; (out) Execution time mean : 13.498015 ms
 
+  ;; pmap (30 times slower!)
   (let [xs (range 100000)] (quick-bench (last (pmap inc xs))))
-;; Execution time mean : 325.748151 ms
+  ; (out) Execution time mean : 389.250834 ms
 
+  ;; map with aggregation
   (let [xs (partition-all 1000 (range 100000))]
     (quick-bench
-     (into [] (comp cat (map inc)) xs))) ; <1>
-;; Execution time mean : 6.553814 ms
+     (into [] (comp cat (map inc)) xs)))
+  ; (out) Execution time mean : 19.781080 ms
 
+  ;; pmap with aggregation (2 times slower!)
   (let [xs (partition-all 1000 (range 100000))]
     (quick-bench
-     (into [] cat (pmap #(map inc %) xs)))) ; <2>
-;; Execution time mean : 13.539197 ms
+     (into [] cat (pmap #(map inc %) xs))))
+  ; (out) Execution time mean : 36.239490 ms
 
   (def xs (map #(if (zero? (mod % 32)) 1000 1) (range 0 320)))
 
   (time (dorun (map #(Thread/sleep %) xs)))
-;; "Elapsed time: 10019.599748 msecs"
+  ; (out) "Elapsed time: 10396.569743 msecs"
 
+  ;; no difference
   (time (dorun (pmap #(Thread/sleep %) xs)))
-;; "Elapsed time: 10024.762327 msecs"
+  ; (out) "Elapsed time: 10006.2885 msecs"
 
+  ;; with `sort` (5 times faster)
+  ;; uniformity is key for `pmap`
   (time (dorun (pmap #(Thread/sleep %) (sort xs)))))
-;; "Elapsed time: 1028.686387 msecs"
+  ; (out) "Elapsed time: 2058.496811 msecs"
