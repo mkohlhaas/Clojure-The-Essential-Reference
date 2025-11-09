@@ -5,5 +5,5 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.xerial/sqlite-jdbc "3.51.0.0"]]
-  :repl-options {:init-ns f.core})
-;; --enable-native-access=ALL-UNNAMED
+  :repl-options {:init-ns f.core}
+  :jvm-opts ["--enable-native-access=ALL-UNNAMED"])
