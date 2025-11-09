@@ -3,6 +3,11 @@
    [java.sql ResultSet ResultSetMetaData]
    [java.sql DriverManager ResultSet]))
 
+;; `resultset-seq` generates a sequence from a java.sql.ResultSet object.
+
+;; If you are dealing with large results and want to process them lazily, you need to be sure the driver supports streaming capabilities.
+
+;; a reified ResultSet object simulates the interaction with a database driver for demonstration purposes
 (defn db-driver [attrs]
   (reify
     ResultSet
@@ -15,8 +20,24 @@
     (close [_])
     (^Object getObject [_ ^int _idx] (rand-int 1000))))
 
-(take 3 (resultset-seq (db-driver ["id" "count"])))
-; ({:id 617, :count 471} {:id 252, :count 482} {:id 153, :count 275})
+(take 10 (resultset-seq (db-driver ["id" "count"])))
+; ({:id 179, :count 786}
+;  {:id 283, :count 404}
+;  {:id 286, :count 180}
+;  {:id 984, :count 74}
+;  {:id 197, :count 327}
+;  {:id 364, :count 459}
+;  {:id 917, :count 523}
+;  {:id 904, :count 396}
+;  {:id 390, :count 553}
+;  {:id 335, :count 687})
+
+(comment
+  (type (resultset-seq (db-driver ["id" "count"])))) ; clojure.lang.Cons
+
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
 
 (defn create-sample-data [stmt]
   (.executeUpdate stmt "drop table if exists person")
