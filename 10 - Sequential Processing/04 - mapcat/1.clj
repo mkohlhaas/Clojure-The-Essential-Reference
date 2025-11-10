@@ -1,3 +1,0 @@
-(mapcat
-  ([f])
-  ([f & colls]))
