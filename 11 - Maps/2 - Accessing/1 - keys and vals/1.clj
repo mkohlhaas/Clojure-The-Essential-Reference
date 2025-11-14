@@ -1,2 +1,0 @@
-(keys [map])
-(vals [map])
