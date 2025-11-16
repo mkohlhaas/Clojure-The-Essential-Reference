@@ -7,7 +7,7 @@
 
 ;; A struct is much simpler than the more powerful defrecord.
 ;; One fundamental difference is that create-struct creates an anonymous struct definition,
-;; while defrecord creates a Java class as a side effect. 
+;; while defrecord creates a Java class as a side effect.
 ;; defrecord generates a class by design: this allows powerful features such as inheritance of record types.
 
 ;; create-struct: create a struct definition
