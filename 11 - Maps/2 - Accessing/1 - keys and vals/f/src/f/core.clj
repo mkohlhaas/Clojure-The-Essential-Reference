@@ -3,6 +3,10 @@
 (keys           {:a 1 :b 2 :c 3 :d 4 :e 5 :f 6 :h 7 :i 8 :j 9}) ; (:e :c :j :h :b :d :f :i :a)
 (vals (array-map :a 1 :b 2 :c 3 :d 4 :e 5 :f 6 :h 7 :i 8 :j 9)) ; (1 2 3 4 5 6 7 8 9)
 
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
+
 (def filter-odd
   (filter (comp odd? second) {:a 1 :b 2 :c 3 :d 4}))
 ; ([:a 1] [:c 3])
@@ -10,6 +14,8 @@
 (map type filter-odd) ; (clojure.lang.MapEntry clojure.lang.MapEntry)
 
 (keys filter-odd) ; (:a :c)
+
+;; Configuration Map (n-grams)
 
 (def matchers
   {"next generation"     10
@@ -24,6 +30,9 @@
    "better solution"      7
    "now with"             6})
 
+;; average transducer
+;; "xf" is a typical suffix to name transducers
+;; "rf" = reducer function(?)
 (defn avg-xf [rf]
   (let [cnt (volatile! 0)]
     (fn
@@ -40,9 +49,9 @@
 (defn score [text]
   (transduce
    (comp
-    (map #(re-find (re-pattern %) text))
-    (keep #(matchers %))
-    avg-xf)
+    (map #(re-find (re-pattern %) text)) ; ("now with", "brings", "you love")
+    (keep #(matchers %))                 ; (6 7 9)
+    avg-xf)                              ; 7.3333335
    +
    (keys matchers)))
 
@@ -60,25 +69,34 @@
   ;  "better solution"
   ;  "revolution")
 
+;; "now with", "brings", "you love"
+;; (/ (+ 6 7 9) 3) ; 22/3
 (score
  "All-new XT600 brings all the features
   you love about XT300, now with a new design,
-  improved sound and a lower price!")
+  improved sound and a lower price!") ; "679"
 ; 7.3333335
 
+;; "perfect"
+;; (/ 5 1) ; 5
 (score
  "We think this book is a perfect fit for the intermediate
   or seasoned Clojure programmer who wants to understand
   how a function (and ultimately Clojure) works")
 ; 5.0
 
-(def big-map (apply hash-map (range 1e7)))
-; {0             1,
-;  1574552 1574553,
-;  9750558 9750559,
-;  1741460 1741461,
-;  1813432 1813433,
-; …}
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Performance Considerations
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(time (first (keys big-map))) ; (out) "Elapsed time: 0.027602 msecs"
-(time (last  (keys big-map))) ; (out) "Elapsed time: 1446.166761 msecs"
+(comment
+  (def big-map (apply hash-map (range 1e7)))
+  ; {0             1,
+  ;  1574552 1574553,
+  ;  9750558 9750559,
+  ;  1741460 1741461,
+  ;  1813432 1813433,
+  ; …}
+
+  (time (first (keys big-map)))  ; (out) "Elapsed time: 0.027602 msecs"
+  (time (last  (keys big-map)))) ; (out) "Elapsed time: 1446.166761 msecs"
