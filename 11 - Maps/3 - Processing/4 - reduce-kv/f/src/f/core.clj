@@ -1,6 +1,6 @@
 (ns f.core
-  ;; (:require [clojure.core.protocols IKVReduce])
-  (:import [java.util LinkedHashMap HashMap]))
+  (:import
+   [java.util LinkedHashMap]))
 
 (reduce
  (fn [m [k v]] (assoc m k (inc v)))
@@ -8,11 +8,17 @@
  {:a 1 :b 2 :c 3})
 ; {:a 2, :b 3, :c 4}
 
+;; `reduce-kv` is dedicated to associative data structures
+;; no complicated destructuring needed
 (reduce-kv
  (fn [m k v] (assoc m k (inc v)))
  {}
  {:a 1 :b 2 :c 3})
 ; {:a 2, :b 3, :c 4}
+
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
 
 (def env
   {"TERM_PROGRAM" "iTerm.app"
@@ -25,12 +31,41 @@
           (.replace "_" "-")
           keyword))
 
+(comment
+  (transform "TERM_PROGRAM")  ; :term-program
+  (transform "COMMAND_MODE")) ; :command-mode
+
 (reduce-kv
- (fn [m k v] (assoc m (transform k) v)) {} env)
+ (fn [m k v] (assoc m (transform k) v))
+ {}
+ env)
 ; {:term-program "iTerm.app",
-;  :shell "/bin/bash",
+;  :shell        "/bin/bash",
 ;  :command-mode "Unix2003"}
 
+(comment
+  (reduce-kv
+   (fn [m k v] (assoc m (transform k) v))
+   {}
+   (System/getenv)))
+  ;; IllegalArgumentException No implementation of method: :kv-reduce of protocol: #'clojure.core.protocols/IKVReduce found for class: java.util.Collections$UnmodifiableMap
+
+(comment
+  (type (System/getenv))) ; java.util.Collections$UnmodifiableMap
+
+#_{:clj-kondo/ignore [:unresolved-namespace]}
+
+(extend-protocol clojure.core.protocols/IKVReduce
+  java.util.Map ; java.util.Collections$UnmodifiableMap extends java.util.Map 
+  (kv-reduce [m f init]
+    (let [iter (.. m entrySet iterator)]
+      (loop [ret init]
+        (if (.hasNext iter)
+          (let [^java.util.Map$Entry kv (.next iter)]
+            (recur (f ret (.getKey kv) (.getValue kv))))
+          ret)))))
+
+;; now it works
 (reduce-kv
  (fn [m k v] (assoc m (transform k) v))
  {}
@@ -40,43 +75,28 @@
 ;  :xdg-session-type "wayland",
 ;  :classpath "/usr/share/java/leiningen-2.11.2-standalone.jar",
 ;  :xdg-session-desktop "gnome",
-; …
+;  …
 ;  :xauthority "/run/user/1000/.mutter-Xwaylandauth.JCD3F3"}
 
-;; IllegalArgumentException No implementation of method: :kv-reduce of protocol: #'clojure.core.protocols/IKVReduce found for class: java.util.Collections$UnmodifiableMap
-
-(comment
-  (extend-protocol clojure.core.protocols/IKVReduce
-    java.util.Map
-    (kv-reduce [m f init]
-      (let [iter (.. m entrySet iterator)]
-        (loop [ret init]
-          (if (.hasNext iter)
-            (let [^java.util.Map$Entry kv (.next iter)]
-              (recur (f ret (.getKey kv) (.getValue kv))))
-            ret))))))
-
-(reduce-kv
- (fn [m k v] (assoc m (transform k) v))
- {}
- (System/getenv))
-
-;; {:jenv-version "oracle64-1.8.0.121",
-;;  :tmux "/private/tmp/tmux-502/default,2685,2",
-;;  :term-program-version "3.1.5",
-;;  :github-username "reborg"
-;;  ...}
-
+;; works also with properties
 (reduce-kv
  (fn [m k v] (assoc m (transform k) v))
  {}
  (System/getProperties))
+; {:java.vendor.url.bug "https://bugreport.java.com/bugreport/",
+;  :jdk.debug "release",
+;  :java.vm.name "OpenJDK 64-Bit Server VM",
+;  :java.vm.compressedoopsmode "Zero based",
+;  :java.vm.version "25.0.1",}
+;  …
+; }
 
-;; {:java.vm.version "25.121-b13",
-;;  :java.specification.name "Java Platform API Specification",
-;;  :java.io.tmpdir "/var/folders/25/T/",
-;;  :java.runtime.name "Java(TM) SE Runtime Environment",
-;;  ...}
+(comment
+  (type (System/getProperties))) ; java.util.Properties (implements java.util.Map)
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; `reduce-kv` and the `reduced` convention
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (reduce-kv
  (fn [m k v]
@@ -87,18 +107,20 @@
  [:a :b :c :d :e])
 ; {0 :a, 1 :b, 2 :c}
 
-(reduce-kv
- (fn [m k v]
-   (if (= k :abort)
-     (reduced m)
-     (assoc m k v)))
- {}
- (LinkedHashMap. {:a 1 :abort true :c 3}))
-; {:a 1}
-
-;; ClassCastException clojure.lang.Reduced cannot be cast to clojure.lang.Associative
+(comment
+  ;; `reduced` doesn't work with LinkedHashMaps
+  (reduce-kv
+   (fn [m k v]
+     (if (= k :abort)
+       (reduced m)
+       (assoc m k v)))
+   {}
+   (LinkedHashMap. {:a 1 :abort true :c 3})))
+  ; (err) Execution error (ClassCastException)
 
 (comment
+  ;; respecting the reduced convention
+  #_{:clj-kondo/ignore [:unresolved-namespace]}
   (extend-protocol clojure.core.protocols/IKVReduce
     java.util.Map
     (kv-reduce [m f init]
@@ -107,16 +129,16 @@
           (if (.hasNext iter)
             (let [^java.util.Map$Entry kv (.next iter)
                   ret (f ret (.getKey kv) (.getValue kv))]
-              (if (reduced? ret) ; <1>
-                @ret
+              (if (reduced? ret)                            ; handle an element wrapped in a reduced object
+                @ret                                        ; return immediately
                 (recur ret)))
-            ret))))))
+            ret)))))
 
-(reduce-kv
- (fn [m k v]
-   (if (= k :abort)
-     (reduced m)
-     (assoc m k v)))
- {}
- (LinkedHashMap. {:a 1 :abort true :c 3}))
-; {:a 1}
+  (reduce-kv
+   (fn [m k v]
+     (if (= k :abort)
+       (reduced m)
+       (assoc m k v)))
+   {}
+   (LinkedHashMap. {:a 1 :abort true :c 3})))
+    ; {:a 1}
