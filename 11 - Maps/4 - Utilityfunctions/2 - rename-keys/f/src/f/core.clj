@@ -1,15 +1,22 @@
 (ns f.core
-  (:require [clojure.set :refer [rename-keys]]))
+  (:require
+   [clojure.set :refer [rename-keys]]))
+
+;; `rename-keys` is limited to the first level (not for nested maps)
 
 (rename-keys {:a 1 :b 2 :c 3} {:a "AA" :b "B1" :c "X"})  ; {"AA" 1, "B1" 2, "X" 3}
 
 (defrecord A [a b c])
 
+;; `rename-keys` returns an array-map/hash-map
 (A. 1 2 3)                                    ; {:a 1, :b 2, :c 3}
 (rename-keys (A. 1 2 3) {:a :y :b :z})        ; {:c 3, :y 1, :z 2}
 (type (rename-keys (A. 1 2 3) {:a :y :b :z})) ; clojure.lang.PersistentArrayMap
 
-(rename-keys (sorted-map :a 1 :b 2 :c 3) {:a :z})  ; {:b 2, :c 3, :z 1}
+;; result of renaming keys in a sorted map is again a sorted map
+(type (sorted-map :c 3, :a 1, :b 2))                       ; clojure.lang.PersistentTreeMap
+(rename-keys (sorted-map :c 3, :a 1, :b 2) {:a :z})        ; {:b 2, :c 3, :z 1}
+(type (rename-keys (sorted-map :c 3, :a 1, :b 2) {:a :z})) ; clojure.lang.PersistentTreeMap
 
 (comment
   (rename-keys (sorted-map :a 1 :b 2 :c 3) {:a 9})
