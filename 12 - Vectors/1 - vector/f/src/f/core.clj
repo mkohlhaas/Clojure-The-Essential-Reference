@@ -3,31 +3,62 @@
    [clj-memory-meter.core   :as     mm]
    [clojure.data            :refer [diff]]
    [clojure.repl            :refer [doc]]
+   [clojure.string          :refer [split-lines]]
    [com.hypirion.clj-xchart :as     chart]
    [criterium.core          :refer [benchmark quick-bench]]))
 
+[:a :b :c]        ; [:a :b :c]
 (vector :a :b :c) ; [:a :b :c]
-
-[:a :b :c]  ; [:a :b :c]
 
 (defn var-args [a b & all]
   (apply vector a b all))
 
 (var-args :a :b :c) ; [:a :b :c]
 
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
+
 (def palindromes ["hannah" "kayak" "civic" "deified"])
 
 (defn longest-palindrome [words]
   (->> words
-       (filter #(= (seq %) (reverse %)))
-       (map #(vector (count %) %))
-       (sort-by first >)
-       first))
+       (filter #(= (seq %) (reverse %))) ; ("hannah" "kayak" "civic" "deified")
+       (map #(vector (count %) %))       ; ([6 "hannah"] [5 "kayak"] [5 "civic"] [7 "deified"])
+       (sort-by first >)                 ; ([7 "deified"] [6 "hannah"] [5 "kayak"] [5 "civic"])
+       first))                           ; [7 "deified"]
 
+;; `(map #([(count %) %]))` wouldn't work
 (macroexpand '#([(count %) %]))
 ; (fn* [p1] ([(count p1) p1]))
 
+(comment
+  (seq     "hannah")  ; (\h \a \n \n \a \h)
+  (reverse "hannah")) ; (\h \a \n \n \a \h)
+
 (longest-palindrome palindromes) ; [7 "deified"]
+
+(defn to-words [file-name]
+  (->> file-name
+       slurp
+       split-lines
+       doall))
+
+(comment
+  ;; NOTE: $ sudo pacman -S words
+  (count (to-words "/usr/share/dict/words")) ; 123985
+
+  (to-words "/usr/share/dict/words"))
+  ; ["A"
+  ;  "a"
+  ;  "AA"
+  ;  "AAA"
+  ;  "Aachen"
+  ;  …]
+
+(longest-palindrome (to-words "/usr/share/dict/words")) ; [7 "deified"]
+
+;; Real-Estate Instructions
 
 (def old-data
   [{:summary "Bijou love nest" :status "SSTC"}
@@ -37,13 +68,19 @@
   [{:summary "Bijou love nest" :status "SSTC"}
    {:summary "Country pile"    :status "SSTC"}])
 
-(doseq [[old-instruction new-instruction]
-        (map vector old-data new-data)]
+(doseq [[old-instruction new-instruction] (map vector old-data new-data)]
   (let [[only-first only-second _both] (diff old-instruction new-instruction)]
     (when (or only-first only-second)
       (println "Differences:" old-instruction new-instruction))))
 ; (out) Differences: {:summary Country pile, :status available} 
 ;                    {:summary Country pile, :status SSTC}))))
+
+(comment
+  (map vector old-data new-data))
+  ; ([{:summary "Bijou love nest", :status "SSTC"}      {:summary "Bijou love nest", :status "SSTC"}]
+  ;  [{:summary "Country pile",    :status "available"} {:summary "Country pile",    :status "SSTC"}])
+
+;; Transpose Matrix 
 
 (def m [[1 2 3]
         [4 5 6]
@@ -53,6 +90,10 @@
 ; ([1 4 7] 
 ;  [2 5 8] 
 ;  [3 6 9]
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure faster "arities"
+;; ;;;;;;;;;;;;;;;;;;;;;;;;
 
 (doc vector)
 ; (out) -------------------------
@@ -79,6 +120,10 @@
 (comment
   #_{:clj-kondo/ignore [:unresolved-symbol]}
   (quick-bench (vector7 1 2 3 4 5 6 7))) ; (out) Execution time mean : 46.156533 ns
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;; 
+;; Performance Considerations 
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;; 
 
 (defmacro b [expr]
   `(first (:mean (benchmark ~expr {}))))
