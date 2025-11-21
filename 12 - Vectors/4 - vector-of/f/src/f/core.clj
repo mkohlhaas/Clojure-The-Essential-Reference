@@ -3,15 +3,23 @@
    [clj-memory-meter.core :as mm]
    [criterium.core :refer [bench quick-bench]]))
 
+; stores primitive values unboxed
+
+(type (vector-of :int))  ; clojure.core.Vec
+(ifn? (vector-of  :int)) ; true
+
 (vector-of  :int)                         ; []
 (vector-of  :int 16/5 2.8 1M Double/NaN)  ; [3 2 1 0]
 ((vector-of :int 1 2 3) 2)                ; 3
 
+;; compare semantic
 (sort [(vector-of :int 7 8 9)
        (vector-of :int 0 1 2)])
 ; ([0 1 2] [7 8 9])
 
 (comment
+  ;; Notable Exceptions
+
   (vector-of Integer 1 2 3)
   ; (err) Execution error (IllegalArgumentException)
 
@@ -24,21 +32,40 @@
   (vector-of :short (inc Short/MAX_VALUE)))
   ; (err) Execution error (IllegalArgumentException) at f.core/eval4120 (form-init18062746941727547297.clj:21).
 
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
+
+;; Mandelbrot Set
+
 (def max-iterations 99)
 
+;; returns real-part, imaginary part, number of iterations
 (defn calc-mandelbrot [c-re c-im]
-  (let [sq    (fn [x] (* x x))
-        iter  (reduce (fn [[z-re z-im] i]
-                        (if (or (= i 99) (> (+ (sq z-re) (sq z-im)) 4))
-                          (reduced i)
-                          [(+ c-re (sq z-re) (- (sq z-im)))
-                           (+ c-im (* 2 z-re z-im))]))
-                      [0 0] (range (inc max-iterations)))]
-    (vector-of :double c-re c-im iter)))
+  (let [sq        (fn [x] (* x x))
+        num-iter  (reduce (fn [[z-re z-im] i]
+                            (if (or (= i 99) (> (+ (sq z-re) (sq z-im)) 4))
+                              (reduced i)
+                              [(+ c-re (sq z-re) (- (sq z-im)))
+                               (+ c-im (* 2 z-re z-im))]))
+                          [0 0]
+                          (range (inc max-iterations)))]
+    (vector-of :double c-re c-im num-iter)))
 
 (def mandelbrot-set
-  (for [im (range 1 -1 -0.05) re (range -2 0.5 0.0315)]
+  (for [im (range  1 -1  -0.05)
+        re (range -2  0.5 0.0315)]
     (calc-mandelbrot re im)))
+  ; ([-2.0 1.0 1.0]
+  ;  [-1.9685 1.0 1.0]
+  ;  [-1.9369999999999998 1.0 1.0]
+  ;  [-1.9054999999999997 1.0 1.0]
+  ;  [-1.8739999999999997 1.0 1.0])
+  ;  …)
+
+(comment
+  (count (range 1 -1 -0.05))     ; 40 (lines)
+  (count (range -2 0.5 0.0315))) ; 80 (columns)
 
 (doseq [row (partition 80 mandelbrot-set)]
   (doseq [point row]
@@ -84,6 +111,10 @@
 ; (out) ************************************************************ *******************
 ; (out) ********************************************************************************
 ; (out) ********************************************************************************
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Performance Considerations
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (comment
   (quick-bench (vector-of :int 1 2 3 4))
