@@ -4,54 +4,82 @@
   (:import
    [java.util ArrayList LinkedList UUID]))
 
-(vec '(:a 1 nil {})) ; [:a 1 nil {}]
+;; `vec` returns a persistent vector instance containing the elements of the input collection.
 
-(def a1 (make-array Long 3))
+(vec  '(:a 1 nil {})) ; [:a 1 nil {}]
+(vector :a 1 nil {})  ; [:a 1 nil {}]
+
+(type (vec  '(:a 1 nil {}))) ; clojure.lang.PersistentVector
+(type (vector :a 1 nil {}))  ; clojure.lang.PersistentVector
+
+;; ;;;;;;;;
+;; Examples
+;; ;;;;;;;;
+
+(def a1 (make-array Long 3)) ; Java array of reference type Long (not long)
 (def v1 (vec a1))
 
+a1             ; [nil, nil, nil]
 v1             ; [nil nil nil]
 (aset a1 1 99) ; 99
+a1             ; [nil, 99, nil]
 v1             ; [nil 99 nil]
 
-(def a2 (long-array 3))
+(def a2 (long-array 3))      ; Java array of long primitives (not references)
 (def v2 (vec a2))
 
+a2             ; [0, 0, 0]
 v2             ; [0 0 0]
 (aset a2 1 99) ; 99
+a2             ; [0, 99, 0]
 v2             ; [0 0 0]
 
-(defn search-merchandise [& search-options]
-  '({:description "Pencil Dress"            :type  :dress
-     :color       :blue                     :price 60}
-    {:description "Asymmetric Lace Dress"   :type  :dress
-     :color       :blue                     :price 70}
-    {:description "Short Sleeve Wrap Dress" :type  :dress
-     :color       :blue                     :price 45}))
+;; Caching Search Results
 
+;; mocking a search
+(defn search-merchandise [& _search-options]
+  '({:description "Pencil Dress"           , :type  :dress, :color :blue, :price 60}
+    {:description "Asymmetric Lace Dress"  , :type  :dress, :color :blue, :price 70}
+    {:description "Short Sleeve Wrap Dress", :type  :dress, :color :blue, :price 45}))
+
+;; thread safe
 (def cache (atom {}))
 
 (defn cache-user-search-results! [search-id search-results]
   (swap! cache assoc search-id (vec search-results)))
 
-(defn retrieve-user-search-results [search-id page]
-  (get (get @cache search-id) page))
+(defn retrieve-user-search-results [search-id page-num]
+  (get (get @cache search-id) page-num))
 
+;; Cheshire would be a professional lib for rendering JSON
 (defn render-to-json [{:keys [description price]}]
   (format "[{'description':'%s', 'price':'%s'}]" description price))
 
-(def search-id (str (UUID/randomUUID)))
+(def search-id (str (UUID/randomUUID))) ; "5ed3724b-0002-4ebe-9cd2-a6162176f623"
 
 (cache-user-search-results!
  search-id
  (search-merchandise {:type :dress :color :blue}))
+; {"5ed3724b-0002-4ebe-9cd2-a6162176f623"
+;  [{:description "Pencil Dress",            :type :dress, :color :blue, :price 60}
+;   {:description "Asymmetric Lace Dress",   :type :dress, :color :blue, :price 70}
+;   {:description "Short Sleeve Wrap Dress", :type :dress, :color :blue, :price 45}]}
 
 (-> (retrieve-user-search-results search-id 0)
     render-to-json)
 ; "[{'description':'Pencil Dress', 'price':'60'}]"
 
+(-> (retrieve-user-search-results search-id 1)
+    render-to-json)
+; "[{'description':'Asymmetric Lace Dress', 'price':'70'}]"
+
 (-> (retrieve-user-search-results search-id 2)
     render-to-json)
 ; "[{'description':'Short Sleeve Wrap Dress', 'price':'45'}]"
+
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Performance Considerations
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmacro b [expr]
   `(first (:mean (quick-benchmark ~expr {}))))
