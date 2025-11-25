@@ -2,6 +2,8 @@
   (:require
    [clojure.xml :as xml]))
 
+;; There are four main concurrency primitives: var, ref, atom and agent.
+
 ;; `future` takes one or more expressions as input and evaluates them asynchronously in another thread
 ;; other future functions in this section: search for future-
 
