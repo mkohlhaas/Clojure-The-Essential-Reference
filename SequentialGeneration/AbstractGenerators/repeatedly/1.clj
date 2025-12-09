@@ -1,3 +1,0 @@
-(repeatedly
-  ([f])
-  ([n f]))
